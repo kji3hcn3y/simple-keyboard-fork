@@ -64,6 +64,7 @@ public final class Settings extends BroadcastReceiver implements SharedPreferenc
     public static final String PREF_SHOW_NUMBER_ROW = "pref_show_number_row";
     public static final String PREF_SPACE_SWIPE = "pref_space_swipe";
     public static final String PREF_DELETE_SWIPE = "pref_delete_swipe";
+    public static final String PREF_SPACE_SWIPE_LANGUAGE = "pref_space_swipe_language";
 
     private static final float UNDEFINED_PREFERENCE_VALUE_FLOAT = -1.0f;
     private static final int UNDEFINED_PREFERENCE_VALUE_INT = -1;
@@ -153,6 +154,7 @@ public final class Settings extends BroadcastReceiver implements SharedPreferenc
                     case PREF_ENABLE_IME_SWITCH:
                     case PREF_DELETE_SWIPE:
                     case PREF_SPACE_SWIPE:
+                    case PREF_SPACE_SWIPE_LANGUAGE:
                     case PREF_VIBRATE_ON:
                     case PREF_SOUND_ON:
                     case PREF_POPUP_ON:
@@ -249,6 +251,10 @@ public final class Settings extends BroadcastReceiver implements SharedPreferenc
 
     public static boolean readDeleteSwipeEnabled(final SharedPreferences prefs) {
         return prefs.getBoolean(PREF_DELETE_SWIPE, false);
+    }
+
+    public static boolean readSpaceSwipeLanguageEnabled(final SharedPreferences prefs) {
+        return prefs.getBoolean(PREF_SPACE_SWIPE_LANGUAGE, false);
     }
 
     public static String readPrefSubtypes(final SharedPreferences prefs) {

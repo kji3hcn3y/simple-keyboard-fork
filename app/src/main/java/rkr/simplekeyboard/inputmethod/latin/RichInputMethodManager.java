@@ -400,6 +400,27 @@ public class RichInputMethodManager {
         }
 
         /**
+         * Switch to the previous subtype in the list.
+         * @param notifyChangeOnCycle whether the subtype changed handler should be notified if the
+         *                           beginning of the list is passed and the previous subtype would
+         *                           go to the last in the list.
+         * @return whether the subtype changed listener was called.
+         */
+        public synchronized boolean switchToPreviousSubtype(final boolean notifyChangeOnCycle) {
+            final int previousIndex = mCurrentSubtypeIndex - 1;
+            if (previousIndex < 0) {
+                mCurrentSubtypeIndex = mSubtypes.size() - 1;
+                if (!notifyChangeOnCycle) {
+                    return false;
+                }
+            } else {
+                mCurrentSubtypeIndex = previousIndex;
+            }
+            notifySubtypeChanged();
+            return true;
+        }
+
+        /**
          * Get the subtype that is currently in use (or will be once the keyboard is opened).
          * @return the current subtype.
          */
@@ -510,6 +531,36 @@ public class RichInputMethodManager {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Switch to the next enabled subtype of this input method only (never switches to a
+     * different input method app). Intended for gestures such as swiping the spacebar.
+     * @param notifyChangeOnCycle whether the subtype changed handler should be notified if the
+     *                           end of the list is passed and the next subtype would go back to
+     *                           the first in the list.
+     * @return whether the subtype changed listener was called.
+     */
+    public boolean switchToNextSubtypeInThisIme(final boolean notifyChangeOnCycle) {
+        if (!hasMultipleEnabledSubtypes()) {
+            return false;
+        }
+        return mSubtypeList.switchToNextSubtype(notifyChangeOnCycle);
+    }
+
+    /**
+     * Switch to the previous enabled subtype of this input method only (never switches to a
+     * different input method app). Intended for gestures such as swiping the spacebar.
+     * @param notifyChangeOnCycle whether the subtype changed handler should be notified if the
+     *                           beginning of the list is passed and the previous subtype would go
+     *                           to the last in the list.
+     * @return whether the subtype changed listener was called.
+     */
+    public boolean switchToPreviousSubtypeInThisIme(final boolean notifyChangeOnCycle) {
+        if (!hasMultipleEnabledSubtypes()) {
+            return false;
+        }
+        return mSubtypeList.switchToPreviousSubtype(notifyChangeOnCycle);
     }
 
     /**

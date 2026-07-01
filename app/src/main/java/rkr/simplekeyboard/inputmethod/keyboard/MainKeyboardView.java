@@ -51,6 +51,7 @@ import rkr.simplekeyboard.inputmethod.latin.Subtype;
 import rkr.simplekeyboard.inputmethod.latin.RichInputMethodManager;
 import rkr.simplekeyboard.inputmethod.latin.common.Constants;
 import rkr.simplekeyboard.inputmethod.latin.common.CoordinateUtils;
+import rkr.simplekeyboard.inputmethod.latin.settings.Settings;
 import rkr.simplekeyboard.inputmethod.latin.utils.LanguageOnSpacebarUtils;
 import rkr.simplekeyboard.inputmethod.latin.utils.LocaleResourceUtils;
 import rkr.simplekeyboard.inputmethod.latin.utils.TypefaceUtils;
@@ -529,9 +530,12 @@ public final class MainKeyboardView extends KeyboardView implements MoreKeysPane
         super.onDrawKeyTopVisuals(key, canvas, paint, params);
         final int code = key.getCode();
         if (code == Constants.CODE_SPACE) {
-            // If more than one language is enabled in current input method
+            // If more than one language is enabled in current input method, or if the user has
+            // enabled changing the language by swiping the spacebar (in which case showing the
+            // current language is helpful even with just one language enabled).
             final RichInputMethodManager imm = RichInputMethodManager.getInstance();
-            if (imm.hasMultipleEnabledSubtypes()) {
+            if (imm.hasMultipleEnabledSubtypes()
+                    || Settings.getInstance().getCurrent().mSpaceSwipeLanguageEnabled) {
                 drawLanguageOnSpacebar(key, canvas, paint);
             }
         }

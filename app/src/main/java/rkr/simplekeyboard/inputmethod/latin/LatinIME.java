@@ -693,6 +693,26 @@ public class LatinIME extends InputMethodService implements KeyboardActionListen
     }
 
     @Override
+    public void onMoveLanguagePointer(int steps) {
+        if (steps == 0) {
+            return;
+        }
+        boolean changed = false;
+        if (steps > 0) {
+            for (int i = 0; i < steps; i++) {
+                changed |= mRichImm.switchToNextSubtypeInThisIme(true);
+            }
+        } else {
+            for (int i = 0; i < -steps; i++) {
+                changed |= mRichImm.switchToPreviousSubtypeInThisIme(true);
+            }
+        }
+        if (changed) {
+            hapticTickFeedback();
+        }
+    }
+
+    @Override
     public void onUpWithDeletePointerActive() {
         if (mInputLogic.mConnection.hasSelection())
             mInputLogic.mConnection.deleteSelectedText();

@@ -70,6 +70,9 @@ public final class PointerTracker implements PointerTrackerQueue.Element {
     // Parameters for pointer handling.
     private static PointerTrackerParams sParams;
     private static int sPointerStep = (int)(10.0 * Resources.getSystem().getDisplayMetrics().density);
+    // The distance (in pixels) the finger needs to travel across the spacebar to switch the
+    // input language by one step when the "swipe space to change language" setting is enabled.
+    private static int sLanguageSwipeStep = (int)(40.0 * Resources.getSystem().getDisplayMetrics().density);
 
     private static final ArrayList<PointerTracker> sTrackers = new ArrayList<>();
     private static final PointerTrackerQueue sPointerTrackerQueue = new PointerTrackerQueue();
@@ -617,6 +620,19 @@ public final class PointerTracker implements PointerTrackerQueue.Element {
 
     private void onMoveEventInternal(final int x, final int y, final long eventTime) {
         final Key oldKey = mCurrentKey;
+
+        if (oldKey != null && oldKey.getCode() == Constants.CODE_SPACE && Settings.getInstance().getCurrent().mSpaceSwipeLanguageEnabled) {
+            //Language slider: swipe right on the spacebar to move to the next enabled input
+            //language, swipe left to move to the previous one.
+            int steps = (x - mStartX) / sLanguageSwipeStep;
+            final int swipeIgnoreTime = Settings.getInstance().getCurrent().mKeyLongpressTimeout / MULTIPLIER_FOR_LONG_PRESS_TIMEOUT_IN_SLIDING_INPUT;
+            if (steps != 0 && mStartTime + swipeIgnoreTime < System.currentTimeMillis()) {
+                mCursorMoved = true;
+                mStartX += steps * sLanguageSwipeStep;
+                sListener.onMoveLanguagePointer(steps);
+            }
+            return;
+        }
 
         if (oldKey != null && oldKey.getCode() == Constants.CODE_SPACE && Settings.getInstance().getCurrent().mSpaceSwipeEnabled) {
             //Pointer slider

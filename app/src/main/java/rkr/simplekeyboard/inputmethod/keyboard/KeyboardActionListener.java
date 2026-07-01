@@ -78,6 +78,7 @@ public interface KeyboardActionListener {
     boolean onCustomRequest(int requestCode);
     void onMoveCursorPointer(int steps);
     void onMoveDeletePointer(int steps);
+    void onMoveLanguagePointer(int steps);
     void onUpWithDeletePointerActive();
     void onUpWithSpacePointerActive();
 
@@ -102,6 +103,8 @@ public interface KeyboardActionListener {
         public void onMoveCursorPointer(int steps) {}
         @Override
         public void onMoveDeletePointer(int steps) {}
+        @Override
+        public void onMoveLanguagePointer(int steps) {}
         @Override
         public void onUpWithDeletePointerActive() {}
         @Override

@@ -36,6 +36,7 @@ import rkr.simplekeyboard.inputmethod.keyboard.KeyboardLayoutSet;
  * - Show on-screen keyboard
  * - Switch to other keyboards
  * - Space swipe cursor move
+ * - Space swipe language change
  * - Delete swipe
  */
 public final class PreferencesSettingsFragment extends SubScreenFragment {
@@ -54,6 +55,16 @@ public final class PreferencesSettingsFragment extends SubScreenFragment {
         if (key.equals(Settings.PREF_SHOW_SPECIAL_CHARS) ||
                 key.equals(Settings.PREF_SHOW_NUMBER_ROW)) {
             KeyboardLayoutSet.onKeyboardThemeChanged();
+        }
+        // The two spacebar swipe gestures (move cursor / change language) both use a horizontal
+        // swipe on the spacebar, so they can't be used at the same time. Enabling one disables
+        // the other.
+        if (key.equals(Settings.PREF_SPACE_SWIPE_LANGUAGE)
+                && prefs.getBoolean(Settings.PREF_SPACE_SWIPE_LANGUAGE, false)) {
+            prefs.edit().putBoolean(Settings.PREF_SPACE_SWIPE, false).apply();
+        } else if (key.equals(Settings.PREF_SPACE_SWIPE)
+                && prefs.getBoolean(Settings.PREF_SPACE_SWIPE, false)) {
+            prefs.edit().putBoolean(Settings.PREF_SPACE_SWIPE_LANGUAGE, false).apply();
         }
     }
 }
