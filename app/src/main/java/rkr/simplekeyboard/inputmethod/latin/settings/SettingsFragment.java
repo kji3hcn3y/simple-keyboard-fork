@@ -39,8 +39,12 @@ public final class SettingsFragment extends InputMethodSettingsFragment {
         setHasOptionsMenu(true);
         addPreferencesFromResource(R.xml.prefs);
         final PreferenceScreen preferenceScreen = getPreferenceScreen();
-        preferenceScreen.setTitle(
-                ApplicationUtils.getActivityTitleResId(getActivity(), SettingsActivity.class));
+        final int titleRes = ApplicationUtils.getActivityTitleResId(getActivity(), SettingsActivity.class);
+        if (titleRes != 0) {
+            preferenceScreen.setTitle(titleRes);
+        } else {
+            preferenceScreen.setTitle(R.string.english_ime_name);
+        }
         final Resources res = getResources();
     }
 

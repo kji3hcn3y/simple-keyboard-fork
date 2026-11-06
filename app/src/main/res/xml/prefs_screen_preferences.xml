@@ -54,6 +54,11 @@
         android:summary="@string/space_swipe_language_switch_summary"
         android:title="@string/space_swipe_language_switch" />
     <SwitchPreference
+        android:defaultValue="true"
+        android:key="pref_show_suggestions"
+        android:summary="@string/show_suggestions_summary"
+        android:title="@string/show_suggestions" />
+    <SwitchPreference
         android:key="pref_delete_swipe"
         android:title="@string/delete_swipe"
         android:defaultValue="false" />

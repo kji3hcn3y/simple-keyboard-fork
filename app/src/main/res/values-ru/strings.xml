@@ -57,6 +57,8 @@
     <string name="space_swipe_language_switch">Переключать язык по пробелу</string>
     <string name="space_swipe_language_switch_summary">Свайп влево/вправо по пробелу переключает язык клавиатуры вместо перемещения курсора</string>
     <string name="delete_swipe">Удалить смахиванием</string>
+    <string name="show_suggestions">Показывать подсказки слов</string>
+    <string name="show_suggestions_summary">Отображать варианты и исправления слов при вводе</string>
     <string name="setup_message">Simple Keyboard не включена. Нажмите «ОК», чтобы выбрать языки в настройках ввода. Вам нужно будет выбрать Simple Keyboard текущей клавиатурой, чтобы использовать её.</string>
     <string name="user_languages">Включённые языки</string>
     <string name="add_language">Добавить язык</string>

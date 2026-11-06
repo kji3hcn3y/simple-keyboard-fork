@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - 'v*'
+      - '[0-9]+*'
   workflow_dispatch:
 
 permissions:
@@ -33,22 +34,24 @@ jobs:
       - name: Prepare APK for Release
         run: |
           mkdir -p release-apk
-          cp app/build/outputs/apk/release/*.apk release-apk/simple-keyboard-fork-v6.8.apk
+          cp app/build/outputs/apk/release/*.apk release-apk/simple-keyboard-fork-${{ github.ref_name }}.apk
 
       - name: Create Release and Upload APK
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_type == 'tag' && github.ref_name || 'v6.8' }}
-          name: Simple Keyboard Fork ${{ github.ref_type == 'tag' && github.ref_name || 'v6.8' }}
+          tag_name: ${{ github.ref_name }}
+          name: Simple Keyboard Fork ${{ github.ref_name }}
           body: |
-            ## Simple Keyboard Fork Release
+            ## Simple Keyboard Fork ${{ github.ref_name }}
             
             ### Fork Changes:
+            - **Word suggestions / Подсказки слов:** zero-heap быстрое автодополнение (150K слов для русского и английского языков).
             - **Space swipe language switch / Смена языка свайпом по пробелу:** свайп влево/вправо по пробелу переключает язык с виброоткликом.
             - **Animations & ripple / Анимации и ripple-эффект:** тактильные анимации нажатия клавиш, пробела и ripple-эффект.
             - **Default languages / Языки по умолчанию:** English + Russian включены сразу при установке.
+            - **Tablet layout / Планшетная разметка:** полноразмерный цифровой ряд и кнопка настроек на планшетах.
             - **Changed defaults / Настройки по умолчанию:** цифровой ряд включён, системная тема с рамками клавиш, кнопка смены языка скрыта в пользу свайпа.
-            - **Launcher icon hidden:** доступ к настройкам через системное меню «Язык и ввод».
-          files: release-apk/simple-keyboard-fork-v6.8.apk
+            - **Edge-to-Edge & Navigation bar:** поддержка окрашивания нижней панели и свободного отступа в цвет темы клавиатуры.
+          files: release-apk/simple-keyboard-fork-${{ github.ref_name }}.apk
           draft: false
           prerelease: false

@@ -2,12 +2,12 @@ apply plugin: 'com.android.application'
 
 android {
     defaultConfig {
-        applicationId "rkr.simplekeyboard.inputmethod"
+        applicationId "rkr.simplekeyboard.inputmethod.fork"
         compileSdk 37
         minSdkVersion 24
         targetSdkVersion 37
-        versionCode 149
-        versionName "6.8"
+        versionCode 1
+        versionName "1.0"
     }
     buildTypes {
         release {
@@ -17,6 +17,10 @@ android {
         }
     }
     namespace 'rkr.simplekeyboard.inputmethod'
+
+    androidResources {
+        noCompress 'bin'
+    }
 
     dependenciesInfo {
         includeInApk = false

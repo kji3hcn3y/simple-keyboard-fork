@@ -52,6 +52,7 @@ import java.io.PrintWriter;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import rkr.simplekeyboard.inputmethod.R;
 import rkr.simplekeyboard.inputmethod.compat.EditorInfoCompatUtils;
 import rkr.simplekeyboard.inputmethod.compat.PreferenceManagerCompat;
 import rkr.simplekeyboard.inputmethod.event.Event;
@@ -70,13 +71,18 @@ import rkr.simplekeyboard.inputmethod.latin.settings.SettingsValues;
 import rkr.simplekeyboard.inputmethod.latin.utils.ApplicationUtils;
 import rkr.simplekeyboard.inputmethod.latin.utils.LeakGuardHandlerWrapper;
 import rkr.simplekeyboard.inputmethod.latin.utils.ResourceUtils;
+import android.text.InputType;
+import java.util.List;
+import rkr.simplekeyboard.inputmethod.latin.suggestions.SuggestionManager;
+import rkr.simplekeyboard.inputmethod.latin.suggestions.SuggestionStripView;
 import rkr.simplekeyboard.inputmethod.latin.utils.ViewLayoutUtils;
 
 /**
  * Input method implementation for Qwerty'ish keyboard.
  */
 public class LatinIME extends InputMethodService implements KeyboardActionListener,
-        RichInputMethodManager.SubtypeChangedListener {
+        RichInputMethodManager.SubtypeChangedListener,
+        SuggestionStripView.Listener {
     static final String TAG = LatinIME.class.getSimpleName();
     private static final boolean TRACE = false;
 
@@ -258,6 +264,7 @@ public class LatinIME extends InputMethodService implements KeyboardActionListen
         mRichImm.setSubtypeChangeHandler(this);
         KeyboardSwitcher.init(this);
         AudioAndHapticFeedbackManager.init(this);
+        SuggestionManager.init(this);
         super.onCreate();
 
         // TODO: Resolve mutual dependencies of {@link #loadSettings()} and
@@ -272,6 +279,7 @@ public class LatinIME extends InputMethodService implements KeyboardActionListen
 
     private void loadSettings() {
         mLocale = mRichImm.getCurrentSubtype().getLocaleObject();
+        SuggestionManager.getInstance().setLocale(mLocale);
         final EditorInfo editorInfo = getCurrentInputEditorInfo();
         final InputAttributes inputAttributes = new InputAttributes(editorInfo, isFullscreenMode());
         mSettings.loadSettings(inputAttributes);
@@ -422,6 +430,7 @@ public class LatinIME extends InputMethodService implements KeyboardActionListen
         // The EditorInfo might have a flag that affects fullscreen mode.
         // Note: This call should be done by InputMethodService?
         updateFullscreenMode();
+        setNavigationBarColor();
 
         // ALERT: settings have not been reloaded and there is a chance they may be stale.
         // In the practice, if it is, we should have gotten onConfigurationChanged so it should
@@ -453,11 +462,10 @@ public class LatinIME extends InputMethodService implements KeyboardActionListen
             switcher.loadKeyboard(editorInfo, currentSettingsValues, getCurrentAutoCapsState(),
                     getCurrentRecapitalizeState());
         } else {
-            // TODO: Come up with a more comprehensive way to reset the keyboard layout when
-            // a keyboard layout set doesn't get reloaded in this method.
             switcher.resetKeyboardStateToAlphabet(getCurrentAutoCapsState(),
                     getCurrentRecapitalizeState());
         }
+        updateSuggestions();
 
         if (TRACE) Debug.startMethodTracing("/data/trace/latinime");
     }
@@ -465,8 +473,7 @@ public class LatinIME extends InputMethodService implements KeyboardActionListen
     @Override
     public void onWindowShown() {
         super.onWindowShown();
-        if (isInputViewShown())
-            setNavigationBarColor();
+        setNavigationBarColor();
     }
 
     @Override
@@ -489,10 +496,14 @@ public class LatinIME extends InputMethodService implements KeyboardActionListen
 
     void onFinishInputViewInternal(final boolean finishingInput) {
         super.onFinishInputView(finishingInput);
+        if (mKeyboardSwitcher != null && mKeyboardSwitcher.getSuggestionStripView() != null) {
+            mKeyboardSwitcher.getSuggestionStripView().clear();
+        }
     }
 
     protected void deallocateMemory() {
         mKeyboardSwitcher.deallocateMemory();
+        SuggestionManager.getInstance().deallocateMemory();
     }
 
     @Override
@@ -514,6 +525,7 @@ public class LatinIME extends InputMethodService implements KeyboardActionListen
 
             mKeyboardSwitcher.requestUpdatingShiftState(getCurrentAutoCapsState(),
                     getCurrentRecapitalizeState());
+            updateSuggestions();
         }
     }
 
@@ -548,7 +560,14 @@ public class LatinIME extends InputMethodService implements KeyboardActionListen
             outInsets.visibleTopInsets = inputHeight;
             return;
         }
-        final int visibleTopY = inputHeight - visibleKeyboardView.getHeight();
+        final View container = mInputView.findViewById(R.id.keyboard_container);
+        final int visibleHeight;
+        if (container != null && container.getHeight() > 0) {
+            visibleHeight = container.getHeight();
+        } else {
+            visibleHeight = mKeyboardSwitcher.getVisibleHeight();
+        }
+        final int visibleTopY = inputHeight - visibleHeight;
         // Need to set expanded touchable region only if a keyboard view is being shown.
         if (visibleKeyboardView.isShown()) {
             final int touchLeft = 0;
@@ -618,6 +637,7 @@ public class LatinIME extends InputMethodService implements KeyboardActionListen
             ViewLayoutUtils.updateLayoutGravityOf(inputArea, Gravity.BOTTOM);
             ViewLayoutUtils.updateLayoutHeightOf(mInputView, layoutHeight);
         }
+        setNavigationBarColor();
     }
 
     int getCurrentAutoCapsState() {
@@ -832,6 +852,7 @@ public class LatinIME extends InputMethodService implements KeyboardActionListen
             break;
         default: // SHIFT_NO_UPDATE
         }
+        updateSuggestions();
     }
 
     private void hapticAndAudioFeedback(final int code, final int repeatCount) {
@@ -946,15 +967,17 @@ public class LatinIME extends InputMethodService implements KeyboardActionListen
     }
 
     private void setNavigationBarColor() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            final Window window = getWindow().getWindow();
-            if (window == null) {
-                return;
-            }
-            final SharedPreferences prefs = PreferenceManagerCompat.getDeviceSharedPreferences(this);
-            final int keyboardColor = Settings.readKeyboardColor(prefs, this);
-            window.setNavigationBarColor(keyboardColor);
+        final Window window = getWindow().getWindow();
+        if (window == null) {
+            return;
+        }
+        final SharedPreferences prefs = PreferenceManagerCompat.getDeviceSharedPreferences(this);
+        final int keyboardColor = Settings.readKeyboardColor(prefs, this);
+        window.setNavigationBarColor(keyboardColor);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             window.setNavigationBarContrastEnforced(false);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             final int flag = WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
             if (ResourceUtils.isBrightColor(keyboardColor)) {
                 window.getInsetsController().setSystemBarsAppearance(flag, flag);
@@ -962,5 +985,69 @@ public class LatinIME extends InputMethodService implements KeyboardActionListen
                 window.getInsetsController().setSystemBarsAppearance(0, flag);
             }
         }
+        if (mInputView != null) {
+            final View container = mInputView.findViewById(R.id.keyboard_container);
+            if (container != null) {
+                container.setBackgroundColor(keyboardColor);
+            }
+        }
+    }
+
+    @Override
+    public void onSuggestionChosen(final String word) {
+        mInputLogic.mConnection.beginBatchEdit();
+        final String currentWord = mInputLogic.mConnection.getWordBeforeCursor();
+        final int currentLen = currentWord != null ? currentWord.length() : 0;
+        if (currentLen > 0) {
+            mInputLogic.mConnection.deleteTextBeforeCursor(currentLen);
+        }
+        mInputLogic.mConnection.commitText(word + " ", 1);
+        mInputLogic.mConnection.endBatchEdit();
+        updateSuggestions();
+    }
+
+    private void updateSuggestions() {
+        if (mKeyboardSwitcher == null) return;
+        final SuggestionStripView strip = mKeyboardSwitcher.getSuggestionStripView();
+        if (strip == null) return;
+
+        final boolean showSuggestions = mSettings.getCurrent().mShowSuggestions;
+        if (!showSuggestions) {
+            strip.setVisibility(View.GONE);
+            strip.clear();
+            return;
+        }
+
+        strip.setVisibility(View.VISIBLE);
+
+        final EditorInfo editorInfo = getCurrentInputEditorInfo();
+        if (editorInfo == null) {
+            strip.clear();
+            return;
+        }
+
+        final int inputType = editorInfo.inputType;
+        final int classType = inputType & InputType.TYPE_MASK_CLASS;
+        if (classType != InputType.TYPE_CLASS_TEXT) {
+            strip.clear();
+            return;
+        }
+
+        final int variation = inputType & InputType.TYPE_MASK_VARIATION;
+        if (variation == InputType.TYPE_TEXT_VARIATION_PASSWORD ||
+                variation == InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD ||
+                variation == InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD) {
+            strip.clear();
+            return;
+        }
+
+        final String wordBefore = mInputLogic.mConnection.getWordBeforeCursor();
+        if (wordBefore == null || wordBefore.isEmpty()) {
+            strip.clear();
+            return;
+        }
+
+        final List<String> suggestions = SuggestionManager.getInstance().getSuggestions(wordBefore, 3);
+        strip.setSuggestions(suggestions);
     }
 }

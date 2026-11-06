@@ -19,6 +19,7 @@
 package rkr.simplekeyboard.inputmethod.keyboard;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Build;
 import android.util.Log;
@@ -28,11 +29,13 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 
 import rkr.simplekeyboard.inputmethod.R;
+import rkr.simplekeyboard.inputmethod.compat.PreferenceManagerCompat;
 import rkr.simplekeyboard.inputmethod.event.Event;
 import rkr.simplekeyboard.inputmethod.keyboard.KeyboardLayoutSet.KeyboardLayoutSetException;
 import rkr.simplekeyboard.inputmethod.keyboard.internal.KeyboardState;
 import rkr.simplekeyboard.inputmethod.keyboard.internal.KeyboardTextsSet;
 import rkr.simplekeyboard.inputmethod.latin.InputView;
+import rkr.simplekeyboard.inputmethod.latin.suggestions.SuggestionStripView;
 import rkr.simplekeyboard.inputmethod.latin.LatinIME;
 import rkr.simplekeyboard.inputmethod.latin.RichInputMethodManager;
 import rkr.simplekeyboard.inputmethod.latin.settings.Settings;
@@ -46,6 +49,7 @@ public final class KeyboardSwitcher implements KeyboardState.SwitchActions {
     private static final String TAG = KeyboardSwitcher.class.getSimpleName();
 
     private MainKeyboardView mKeyboardView;
+    private SuggestionStripView mSuggestionStripView;
     private LatinIME mLatinIME;
     private RichInputMethodManager mRichImm;
 
@@ -356,7 +360,28 @@ public final class KeyboardSwitcher implements KeyboardState.SwitchActions {
         return mKeyboardView;
     }
 
+    public SuggestionStripView getSuggestionStripView() {
+        return mSuggestionStripView;
+    }
+
+    public int getVisibleHeight() {
+        int height = mKeyboardView != null ? mKeyboardView.getHeight() : 0;
+        if (mSuggestionStripView != null && mSuggestionStripView.getVisibility() == View.VISIBLE) {
+            int stripHeight = mSuggestionStripView.getHeight();
+            if (stripHeight == 0 && mSuggestionStripView.getLayoutParams() != null) {
+                stripHeight = mSuggestionStripView.getLayoutParams().height;
+            }
+            if (stripHeight > 0) {
+                height += stripHeight;
+            }
+        }
+        return height;
+    }
+
     public void deallocateMemory() {
+        if (mSuggestionStripView != null) {
+            mSuggestionStripView.clear();
+        }
         if (mKeyboardView != null) {
             mKeyboardView.cancelAllOngoingEvents();
             mKeyboardView.deallocateMemory();
@@ -374,7 +399,17 @@ public final class KeyboardSwitcher implements KeyboardState.SwitchActions {
                 R.layout.input_view, null);
 
         mKeyboardView = currentInputView.findViewById(R.id.keyboard_view);
+        mSuggestionStripView = currentInputView.findViewById(R.id.suggestion_strip_view);
+        final View container = currentInputView.findViewById(R.id.keyboard_container);
+        if (container != null) {
+            final SharedPreferences prefs = PreferenceManagerCompat.getDeviceSharedPreferences(mThemeContext);
+            final int keyboardColor = Settings.readKeyboardColor(prefs, mThemeContext);
+            container.setBackgroundColor(keyboardColor);
+        }
         mKeyboardView.setKeyboardActionListener(mLatinIME);
+        if (mSuggestionStripView != null) {
+            mSuggestionStripView.setListener(mLatinIME);
+        }
         return currentInputView;
     }
 }

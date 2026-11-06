@@ -32,15 +32,10 @@ import rkr.simplekeyboard.inputmethod.latin.common.StringUtils;
  * A helper class to deal with displaying locales.
   */
 public final class LocaleResourceUtils {
-    // This reference class {@link R} must be located in the same package as LatinIME.java.
-    private static final String RESOURCE_PACKAGE_NAME = R.class.getPackage().getName();
-
     private static volatile boolean sInitialized = false;
     private static final Object sInitializeLock = new Object();
     private static Resources sResources;
-    // Exceptional locale whose name should be displayed in Locale.ROOT.
     private static final HashMap<String, Integer> sExceptionalLocaleDisplayedInRootLocale = new HashMap<>();
-    // Exceptional locale to locale name resource id map.
     private static final HashMap<String, Integer> sExceptionalLocaleToNameIdsMap = new HashMap<>();
     private static final String LOCALE_NAME_RESOURCE_PREFIX =
             "string/locale_name_";
@@ -48,10 +43,8 @@ public final class LocaleResourceUtils {
             "string/locale_name_in_root_locale_";
 
     private LocaleResourceUtils() {
-        // Intentional empty constructor for utility class.
     }
 
-    // Note that this initialization method can be called multiple times.
     public static void init(final Context context) {
         synchronized (sInitializeLock) {
             if (sInitialized == false) {
@@ -68,22 +61,27 @@ public final class LocaleResourceUtils {
     private static void initLocked(final Context context) {
         final Resources res = context.getResources();
         sResources = res;
+        final String packageName = context.getPackageName();
 
         final String[] exceptionalLocaleInRootLocale = res.getStringArray(
                 R.array.locale_displayed_in_root_locale);
         for (int i = 0; i < exceptionalLocaleInRootLocale.length; i++) {
             final String localeString = exceptionalLocaleInRootLocale[i];
             final String resourceName = LOCALE_NAME_RESOURCE_IN_ROOT_LOCALE_PREFIX + localeString;
-            final int resId = res.getIdentifier(resourceName, null, RESOURCE_PACKAGE_NAME);
-            sExceptionalLocaleDisplayedInRootLocale.put(localeString, resId);
+            final int resId = res.getIdentifier(resourceName, null, packageName);
+            if (resId != 0) {
+                sExceptionalLocaleDisplayedInRootLocale.put(localeString, resId);
+            }
         }
 
         final String[] exceptionalLocales = res.getStringArray(R.array.locale_exception_keys);
         for (int i = 0; i < exceptionalLocales.length; i++) {
             final String localeString = exceptionalLocales[i];
             final String resourceName = LOCALE_NAME_RESOURCE_PREFIX + localeString;
-            final int resId = res.getIdentifier(resourceName, null, RESOURCE_PACKAGE_NAME);
-            sExceptionalLocaleToNameIdsMap.put(localeString, resId);
+            final int resId = res.getIdentifier(resourceName, null, packageName);
+            if (resId != 0) {
+                sExceptionalLocaleToNameIdsMap.put(localeString, resId);
+            }
         }
     }
 
@@ -102,7 +100,7 @@ public final class LocaleResourceUtils {
      */
     public static String getLocaleDisplayNameInSystemLocale(
             final String localeString) {
-        final Locale displayLocale = sResources.getConfiguration().locale;
+        final Locale displayLocale = sResources != null ? sResources.getConfiguration().locale : Locale.getDefault();
         return getLocaleDisplayNameInternal(localeString, displayLocale);
     }
 
@@ -125,7 +123,7 @@ public final class LocaleResourceUtils {
      */
     public static String getLanguageDisplayNameInSystemLocale(
             final String localeString) {
-        final Locale displayLocale = sResources.getConfiguration().locale;
+        final Locale displayLocale = sResources != null ? sResources.getConfiguration().locale : Locale.getDefault();
         final String languageString;
         if (sExceptionalLocaleDisplayedInRootLocale.containsKey(localeString)) {
             languageString = localeString;
@@ -164,8 +162,13 @@ public final class LocaleResourceUtils {
             exceptionalNameResId = null;
         }
 
-        if (exceptionalNameResId != null) {
-            return sResources.getString(exceptionalNameResId);
+        if (exceptionalNameResId != null && exceptionalNameResId != 0 && sResources != null) {
+            try {
+                return sResources.getString(exceptionalNameResId);
+            } catch (Exception e) {
+                return LocaleUtils.constructLocaleFromString(localeString)
+                        .getDisplayName(displayLocale);
+            }
         } else {
             return LocaleUtils.constructLocaleFromString(localeString)
                     .getDisplayName(displayLocale);

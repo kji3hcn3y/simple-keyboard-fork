@@ -50,6 +50,7 @@ public class SettingsValues {
     public final boolean mSpaceSwipeEnabled;
     public final boolean mDeleteSwipeEnabled;
     public final boolean mSpaceSwipeLanguageSwitchEnabled;
+    public final boolean mShowSuggestions;
 
     // From the input box
     public final InputAttributes mInputAttributes;
@@ -93,6 +94,7 @@ public class SettingsValues {
         mSpaceSwipeEnabled = Settings.readSpaceSwipeEnabled(prefs);
         mDeleteSwipeEnabled = Settings.readDeleteSwipeEnabled(prefs);
         mSpaceSwipeLanguageSwitchEnabled = Settings.readSpaceSwipeLanguageSwitchEnabled(prefs);
+        mShowSuggestions = Settings.readShowSuggestions(prefs);
     }
 
     public boolean isWordSeparator(final int code) {
