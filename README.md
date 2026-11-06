@@ -19,4 +19,3 @@
   * **Feedback / Отклик:** Sound ON, Vibration OFF / Звук вкл, вибрация выкл.
 * **Launcher icon hidden / Скрыта иконка из лаунчера:**
   * Accessible via system *Language & Input* settings.
-  * Доступ к настройкам только через системное меню «Язык и ввод».
