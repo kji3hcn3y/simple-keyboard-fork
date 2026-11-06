@@ -80,6 +80,7 @@ public interface KeyboardActionListener {
     void onMoveDeletePointer(int steps);
     void onUpWithDeletePointerActive();
     void onUpWithSpacePointerActive();
+    void onMoveLanguageSwitchPointer(int steps);
 
     KeyboardActionListener EMPTY_LISTENER = new Adapter();
 
@@ -106,5 +107,7 @@ public interface KeyboardActionListener {
         public void onUpWithDeletePointerActive() {}
         @Override
         public void onUpWithSpacePointerActive() {}
+        @Override
+        public void onMoveLanguageSwitchPointer(int steps) {}
     }
 }

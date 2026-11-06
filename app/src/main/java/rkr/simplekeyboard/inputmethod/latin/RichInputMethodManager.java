@@ -399,6 +399,20 @@ public class RichInputMethodManager {
             return true;
         }
 
+        public synchronized boolean switchToPreviousSubtype(final boolean notifyChangeOnCycle) {
+            final int previousIndex = mCurrentSubtypeIndex - 1;
+            if (previousIndex < 0) {
+                mCurrentSubtypeIndex = mSubtypes.size() - 1;
+                if (!notifyChangeOnCycle) {
+                    return false;
+                }
+            } else {
+                mCurrentSubtypeIndex = previousIndex;
+            }
+            notifySubtypeChanged();
+            return true;
+        }
+
         /**
          * Get the subtype that is currently in use (or will be once the keyboard is opened).
          * @return the current subtype.
@@ -510,6 +524,20 @@ public class RichInputMethodManager {
             return true;
         }
         return false;
+    }
+
+    public boolean switchToNextSubtypeOnly() {
+        if (!hasMultipleEnabledSubtypes()) {
+            return false;
+        }
+        return mSubtypeList.switchToNextSubtype(true);
+    }
+
+    public boolean switchToPreviousSubtypeOnly() {
+        if (!hasMultipleEnabledSubtypes()) {
+            return false;
+        }
+        return mSubtypeList.switchToPreviousSubtype(true);
     }
 
     /**

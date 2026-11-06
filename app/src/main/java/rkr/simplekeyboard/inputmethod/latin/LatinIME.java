@@ -703,6 +703,30 @@ public class LatinIME extends InputMethodService implements KeyboardActionListen
         mInputLogic.reloadTextCache();
     }
 
+    @Override
+    public void onMoveLanguageSwitchPointer(int steps) {
+        if (steps == 0) {
+            return;
+        }
+        boolean switched = false;
+        if (steps > 0) {
+            for (int i = 0; i < steps; i++) {
+                if (mRichImm.switchToNextSubtypeOnly()) {
+                    switched = true;
+                }
+            }
+        } else {
+            for (int i = 0; i > steps; i--) {
+                if (mRichImm.switchToPreviousSubtypeOnly()) {
+                    switched = true;
+                }
+            }
+        }
+        if (switched) {
+            hapticTickFeedback();
+        }
+    }
+
     private boolean isShowingOptionDialog() {
         return mOptionsDialog != null && mOptionsDialog.isShowing();
     }

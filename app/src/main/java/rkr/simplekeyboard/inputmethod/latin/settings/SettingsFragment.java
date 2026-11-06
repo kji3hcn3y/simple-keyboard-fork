@@ -42,21 +42,6 @@ public final class SettingsFragment extends InputMethodSettingsFragment {
         preferenceScreen.setTitle(
                 ApplicationUtils.getActivityTitleResId(getActivity(), SettingsActivity.class));
         final Resources res = getResources();
-
-        findPreference("privacy_policy").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                openUrl(res.getString(R.string.privacy_policy_url));
-                return true;
-            }
-        });
-        findPreference("license").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                openUrl(res.getString(R.string.license_url));
-                return true;
-            }
-        });
     }
 
     private void openUrl(String uri) {

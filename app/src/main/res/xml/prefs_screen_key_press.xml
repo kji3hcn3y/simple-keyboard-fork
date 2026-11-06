@@ -19,15 +19,15 @@
     xmlns:latin="http://schemas.android.com/apk/res-auto"
     android:title="@string/settings_screen_key_press">
     <SwitchPreference
+        android:defaultValue="false"
         android:key="vibrate_on"
-        android:title="@string/vibrate_on_keypress"
-        android:defaultValue="@bool/config_default_vibration_enabled"
-        android:persistent="true" />
+        android:persistent="true"
+        android:title="@string/vibrate_on_keypress" />
     <SwitchPreference
+        android:defaultValue="true"
         android:key="sound_on"
-        android:title="@string/sound_on_keypress"
-        android:defaultValue="@bool/config_default_sound_enabled"
-        android:persistent="true" />
+        android:persistent="true"
+        android:title="@string/sound_on_keypress" />
     <rkr.simplekeyboard.inputmethod.latin.settings.SeekBarDialogPreference
         android:key="pref_keypress_sound_volume"
         android:title="@string/prefs_keypress_sound_volume_settings"

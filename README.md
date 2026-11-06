@@ -1,40 +1,22 @@
-# Simple Keyboard
+# Simple Keyboard (Fork)
 
-[![Crowdin](https://d322cqt584bo4o.cloudfront.net/simple-keyboard/localized.svg)](https://crowdin.com/project/simple-keyboard)
+## Fork Changes / Изменения форка
 
-<img src="images/screenshot-0.png"
-      alt="closeup"
-      width="500"/>
-      
-## About
-
-Features:
-- Small size (<1MB)
-- Adjustable keyboard height for more screen space
-- Number row
-- Swipe space to move pointer
-- Delete swipe
-- Custom theme colors
-- Minimal permissions (only Vibrate)
-- Ads-free
-
-Feature it doesn't have and probably will never have:
-- Emojis
-- GIFs
-- Spell checker
-- Swipe typing
-
-## Downloads
-
-[<img src="https://f-droid.org/badge/get-it-on.png"
-      alt="Get it on F-Droid"
-      height="80">](https://f-droid.org/packages/rkr.simplekeyboard.inputmethod/)
-[<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png"
-      alt="Get it on Google Play"
-      height="80">](https://play.google.com/store/apps/details?id=rkr.simplekeyboard.inputmethod)
-
-## Credits
-
-Licensed under Apache License Version 2
-
-This keyboard is based on AOSP LatinIME keyboard. You can get the original source code in https://android.googlesource.com/platform/packages/inputmethods/LatinIME/
+* **Space swipe language switch / Смена языка свайпом по пробелу:**
+  * Swipe left/right on spacebar (‹ English ›) to switch language with vibration.
+  * Свайп влево/вправо по пробелу переключает язык с виброоткликом.
+* **Animations & ripple / Анимации и ripple-эффект:**
+  * Added tactile key press, spacebar animations, and key ripple effect.
+  * Добавлены анимации нажатия клавиш, пробела и ripple-эффект.
+* **Default languages / Языки по умолчанию:**
+  * English + Russian enabled out of the box.
+  * Английский и русский включены сразу при установке.
+* **Changed defaults / Настройки по умолчанию:**
+  * **Number row / Цифровой ряд:** ON / Включён.
+  * **Theme / Тема:** System Border / Системная с рамками клавиш.
+  * **Language key / Кнопка языка:** Hidden (replaced by swipe) / Скрыта в пользу свайпа.
+  * **Keyboard height / Высота:** 110% (was 100% / увеличена со 100%).
+  * **Feedback / Отклик:** Sound ON, Vibration OFF / Звук вкл, вибрация выкл.
+* **Launcher icon hidden / Скрыта иконка из лаунчера:**
+  * Accessible via system *Language & Input* settings.
+  * Доступ к настройкам только через системное меню «Язык и ввод».

@@ -94,7 +94,7 @@
         android:key="pref_keyboard_height"
         android:title="@string/prefs_keyboard_height_settings"
         android:restrictionType="integer"
-        android:defaultValue="100" />
+        android:defaultValue="110" />
     <restriction
         android:key="pref_bottom_offset_portrait"
         android:title="@string/prefs_bottom_offset_portrait_settings"

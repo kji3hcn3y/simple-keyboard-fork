@@ -25,6 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import rkr.simplekeyboard.inputmethod.R;
+import rkr.simplekeyboard.inputmethod.keyboard.internal.KeyDrawParams;
 import rkr.simplekeyboard.inputmethod.latin.common.Constants;
 import rkr.simplekeyboard.inputmethod.latin.common.CoordinateUtils;
 
@@ -175,12 +176,22 @@ public class MoreKeysKeyboardView extends KeyboardView implements MoreKeysPanel 
 
     private void updateReleaseKeyGraphics(final Key key) {
         key.onReleased();
+        final int alpha = Constants.Color.ALPHA_OPAQUE;  // Fully opaque when released
+        onApplyPressEffect(key, alpha);
         invalidateKey(key);
     }
 
     private void updatePressKeyGraphics(final Key key) {
         key.onPressed();
+        final int pressAlpha = 255;  // Opaque during press
+        onApplyPressEffect(key, pressAlpha);
         invalidateKey(key);
+    }
+
+    protected void onApplyPressEffect(final Key key, final int alpha) {
+        final KeyDrawParams params = getKeyDrawParams().mayCloneAndUpdateParams(key.getHeight(),
+                                                                                     key.getVisualAttributes());
+        params.mAnimAlpha = alpha;
     }
 
     @Override

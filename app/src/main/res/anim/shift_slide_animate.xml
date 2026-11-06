@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android">
+        <objectAnimator
+        android:propertyName="translationX"
+        android:valueFrom="0.0f"
+        android:valueTo="-12.0f"
+        android:duration="60"
+        android:interpolator="@android:anim/accelerate_interpolator"/>
+    
+    <objectAnimator
+        android:propertyName="translationX"
+        android:valueFrom="-12.0f"
+        android:valueTo="0.0f"
+        android:duration="60"
+        android:interpolator="@android:anim/accelerate_interpolator"/>
+</set>

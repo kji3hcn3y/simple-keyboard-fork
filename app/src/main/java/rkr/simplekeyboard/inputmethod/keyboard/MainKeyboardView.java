@@ -420,7 +420,7 @@ public final class MainKeyboardView extends KeyboardView implements MoreKeysPane
     }
 
     public boolean isInCursorMove() {
-        return PointerTracker.isAnyInCursorMove() || mTimerHandler.isInKeyRepeat();
+        return PointerTracker.isAnyInCursorMove();
     }
 
     @Override
@@ -585,7 +585,17 @@ public final class MainKeyboardView extends KeyboardView implements MoreKeysPane
         paint.setTextAlign(Align.CENTER);
         paint.setTypeface(Typeface.DEFAULT);
         paint.setTextSize(mLanguageOnSpacebarTextSize);
-        final String language = layoutLanguageOnSpacebar(paint, keyboard.mId.mSubtype, width);
+        String language = layoutLanguageOnSpacebar(paint, keyboard.mId.mSubtype, width);
+        
+        android.content.SharedPreferences prefs = rkr.simplekeyboard.inputmethod.compat.PreferenceManagerCompat.getDeviceSharedPreferences(getContext());
+        if (rkr.simplekeyboard.inputmethod.latin.settings.Settings.readSpaceSwipeLanguageSwitchEnabled(prefs)) {
+            if (language.isEmpty()) {
+                language = "‹   ›";
+            } else {
+                language = "‹ " + language + " ›";
+            }
+        }
+
         // Draw language text with shadow
         final float descent = paint.descent();
         final float textHeight = -paint.ascent() + descent;
