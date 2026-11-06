@@ -19,3 +19,6 @@
   * **Feedback / Отклик:** Sound ON, Vibration OFF / Звук вкл, вибрация выкл.
 * **Launcher icon hidden / Скрыта иконка из лаунчера:**
   * Accessible via system *Language & Input* settings.
+* **App size notice (bundled dictionaries) / Размер приложения (встроенные словари):**
+  * The application size is notably larger because offline dictionaries are now bundled into the app.
+  * Размер приложения существенно увеличился из-за встроенных офлайн-словарей.
